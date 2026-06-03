@@ -44,6 +44,7 @@ public class SecurityConfig {
                         // 아래의 API는 누구나 접근 가능
                         .requestMatchers(HttpMethod.GET, "/posts").permitAll()
                         .requestMatchers(HttpMethod.GET, "/posts/{postId}").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/posts/*/comments").permitAll()
                         .requestMatchers("/users/signup").permitAll()
                         .requestMatchers("/users/login").permitAll()
                         .requestMatchers("/users/emails/**").permitAll()

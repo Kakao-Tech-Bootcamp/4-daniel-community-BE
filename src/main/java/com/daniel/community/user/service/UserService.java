@@ -2,6 +2,9 @@ package com.daniel.community.user.service;
 
 import com.daniel.community.user.dto.SignupRequest;
 import com.daniel.community.user.dto.SignupResponse;
+import com.daniel.community.user.dto.UpdatePasswordRequest;
+import com.daniel.community.user.dto.UpdateUserRequest;
+import com.daniel.community.user.dto.UserInfoResponse;
 import com.daniel.community.user.entity.User;
 import com.daniel.community.user.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -50,6 +53,49 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
+    public UserInfoResponse getMyInfo(Long userId) {
+        User user = findUser(userId);
+
+        return new UserInfoResponse(user);
+    }
+
+    @Transactional
+    public void updateMyInfo(Long userId, UpdateUserRequest request) {
+        User user = findUser(userId);
+
+        String nickname = request.getNickname();
+
+        if (nickname != null && !nickname.equals(user.getNickname())) {
+            if (nickname.isBlank()) {
+                throw new IllegalArgumentException("invalid_request");
+            }
+
+            if (userRepository.existsByNickname(nickname)) {
+                throw new IllegalArgumentException("nickname_duplicated");
+            }
+        }
+
+        user.updateProfile(request.getNickname(), request.getProfileImage());
+    }
+
+    @Transactional
+    // 비밀번호 변경
+    public void updatePassword(Long userId, UpdatePasswordRequest request) {
+        User user = findUser(userId);
+
+        // 현재 비밀번호와 DB에 저장된 비밀번호를 비교
+        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("invalid_password");
+        }
+
+        // 새 비밀번호를 암호화
+        String encodedPassword = passwordEncoder.encode(request.getNewPassword());
+
+        // Entity의 비밀번호를 변경
+        user.updatePassword(encodedPassword);
+    }
+
+    @Transactional(readOnly = true)
     // 이메일 중복 확인
     public void checkEmail(String email) {
         if (email == null || email.isBlank()) {
@@ -73,5 +119,10 @@ public class UserService {
         if (userRepository.existsByNickname(nickname)) {
             throw new IllegalArgumentException("nickname_duplicated");
         }
+    }
+
+    private User findUser(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("unauthorized"));
     }
 }
