@@ -1,6 +1,6 @@
-package com.daniel.community.repository;
+package com.daniel.community.post.repository;
 
-import com.daniel.community.entity.Post;
+import com.daniel.community.post.entity.Post;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

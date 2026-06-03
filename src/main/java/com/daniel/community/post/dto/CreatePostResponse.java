@@ -1,4 +1,4 @@
-package com.daniel.community.dto;
+package com.daniel.community.post.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

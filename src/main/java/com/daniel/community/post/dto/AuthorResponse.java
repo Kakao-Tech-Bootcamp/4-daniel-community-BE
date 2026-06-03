@@ -1,5 +1,6 @@
-package com.daniel.community.dto;
+package com.daniel.community.post.dto;
 
+import com.daniel.community.user.entity.User;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class AuthorResponse {
@@ -9,9 +10,9 @@ public class AuthorResponse {
     @JsonProperty("profile_image")
     private String profileImage;
 
-    public AuthorResponse(String nickname, String profileImage) {
-        this.nickname = nickname;
-        this.profileImage = profileImage;
+    public AuthorResponse(User user) {
+        this.nickname = user.getNickname();
+        this.profileImage = user.getProfileImage();
     }
 
     public String getNickname() {

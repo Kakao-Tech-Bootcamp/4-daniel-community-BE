@@ -1,9 +1,10 @@
-package com.daniel.community.dto;
+package com.daniel.community.post.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 
-public class CreatePostRequest {
+
+public class UpdatePostRequest {
 
     @NotBlank
     private String title;

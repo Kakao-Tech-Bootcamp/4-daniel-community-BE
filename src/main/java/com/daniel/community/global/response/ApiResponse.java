@@ -1,4 +1,4 @@
-package com.daniel.community.dto;
+package com.daniel.community.global.response;
 
 public class ApiResponse {
 

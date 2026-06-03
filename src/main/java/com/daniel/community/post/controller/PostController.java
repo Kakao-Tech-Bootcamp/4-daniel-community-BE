@@ -1,15 +1,17 @@
-package com.daniel.community.controller;
+package com.daniel.community.post.controller;
 
-import com.daniel.community.dto.ApiResponse;
-import com.daniel.community.dto.CreatePostRequest;
-import com.daniel.community.dto.CreatePostResponse;
-import com.daniel.community.dto.PostDetailResponse;
-import com.daniel.community.dto.PostListResponse;
-import com.daniel.community.dto.UpdatePostRequest;
-import com.daniel.community.service.PostService;
+import com.daniel.community.global.response.ApiResponse;
+import com.daniel.community.post.dto.CreatePostRequest;
+import com.daniel.community.post.dto.CreatePostResponse;
+import com.daniel.community.post.dto.PostDetailResponse;
+import com.daniel.community.post.dto.PostListResponse;
+import com.daniel.community.post.dto.UpdatePostRequest;
+import com.daniel.community.global.security.CustomUserDetails;
+import com.daniel.community.post.service.PostService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -31,8 +33,12 @@ public class PostController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse> createPost(@Valid @RequestBody CreatePostRequest request) {
-        CreatePostResponse response = postService.createPost(request);
+    public ResponseEntity<ApiResponse> createPost(
+            @Valid @RequestBody CreatePostRequest request,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        CreatePostResponse response =
+                postService.createPost(request, userDetails.getUserId());
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -61,27 +67,47 @@ public class PostController {
     @PatchMapping("/{postId}")
     public ResponseEntity<ApiResponse> updatePost(
             @PathVariable Long postId,
-            @Valid @RequestBody UpdatePostRequest request
+            @Valid @RequestBody UpdatePostRequest request,
+            @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         try {
-            postService.updatePost(postId, request);
+            postService.updatePost(postId, request, userDetails.getUserId());
             return ResponseEntity.ok(ApiResponse.success("update_post_success"));
         } catch (IllegalArgumentException exception) {
+            HttpStatus status = getPostErrorStatus(exception.getMessage());
+
             return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
+                    .status(status)
                     .body(ApiResponse.error(exception.getMessage()));
         }
     }
 
     @DeleteMapping("/{postId}")
-    public ResponseEntity<ApiResponse> deletePost(@PathVariable Long postId) {
+    public ResponseEntity<ApiResponse> deletePost(
+            @PathVariable Long postId,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
         try {
-            postService.deletePost(postId);
+            postService.deletePost(postId, userDetails.getUserId());
             return ResponseEntity.ok(ApiResponse.success("delete_post_success"));
         } catch (IllegalArgumentException exception) {
+            HttpStatus status = getPostErrorStatus(exception.getMessage());
+
             return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
+                    .status(status)
                     .body(ApiResponse.error(exception.getMessage()));
         }
+    }
+
+    private HttpStatus getPostErrorStatus(String message) {
+        if ("forbidden".equals(message)) {
+            return HttpStatus.FORBIDDEN;
+        }
+
+        if ("unauthorized".equals(message)) {
+            return HttpStatus.UNAUTHORIZED;
+        }
+
+        return HttpStatus.NOT_FOUND;
     }
 }

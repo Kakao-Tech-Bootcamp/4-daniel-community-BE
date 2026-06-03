@@ -1,6 +1,6 @@
-package com.daniel.community.dto;
+package com.daniel.community.post.dto;
 
-import com.daniel.community.entity.Post;
+import com.daniel.community.post.entity.Post;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.format.DateTimeFormatter;
@@ -35,7 +35,7 @@ public class PostSummaryResponse {
         this.commentsCount = commentsCount;
         this.views = post.getViews();
         this.createdAt = post.getCreatedAt().format(DATE_TIME_FORMATTER);
-        this.author = new AuthorResponse(post.getNickname(), post.getProfileImage());
+        this.author = new AuthorResponse(post.getUser());
     }
 
     public Long getPostId() {

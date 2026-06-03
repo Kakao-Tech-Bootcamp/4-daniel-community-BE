@@ -1,10 +1,14 @@
-package com.daniel.community.entity;
+package com.daniel.community.post.entity;
 
+import com.daniel.community.user.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
@@ -35,11 +39,10 @@ public class Post {
     @Column(nullable = false)
     private int views;
 
-    @Column(nullable = false)
-    private String nickname;
-
-    @Column(name = "profile_image")
-    private String profileImage;
+    // 게시글 하나가 사용자 한명에 속하는 관계
+    @ManyToOne(fetch = FetchType.LAZY) // 작성자 정보를 실제로 필요할 때만 조회
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
@@ -50,12 +53,11 @@ public class Post {
     protected Post() {
     }
 
-    public Post(String title, String content, String postImage, String nickname, String profileImage) {
+    public Post(String title, String content, String postImage, User user) {
         this.title = title;
         this.content = content;
         this.postImage = postImage;
-        this.nickname = nickname;
-        this.profileImage = profileImage;
+        this.user = user;
         this.likes = 0;
         this.views = 0;
     }
@@ -80,8 +82,8 @@ public class Post {
         this.views++;
     }
 
-    public Long getId() {
-        return postId;
+    public boolean isWrittenBy(Long userId) {
+        return this.user.getUserId().equals(userId);
     }
 
     public Long getPostId() {
@@ -108,12 +110,8 @@ public class Post {
         return views;
     }
 
-    public String getNickname() {
-        return nickname;
-    }
-
-    public String getProfileImage() {
-        return profileImage;
+    public User getUser() {
+        return user;
     }
 
     public LocalDateTime getCreatedAt() {
