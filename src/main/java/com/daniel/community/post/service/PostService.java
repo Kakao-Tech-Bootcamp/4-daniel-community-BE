@@ -1,5 +1,6 @@
 package com.daniel.community.post.service;
 
+import com.daniel.community.comment.repository.CommentRepository;
 import com.daniel.community.post.dto.CreatePostRequest;
 import com.daniel.community.post.dto.CreatePostResponse;
 import com.daniel.community.post.dto.PostDetailResponse;
@@ -7,6 +8,7 @@ import com.daniel.community.post.dto.PostListResponse;
 import com.daniel.community.post.dto.PostSummaryResponse;
 import com.daniel.community.post.dto.UpdatePostRequest;
 import com.daniel.community.post.entity.Post;
+import com.daniel.community.post.repository.PostLikeRepository;
 import com.daniel.community.user.entity.User;
 import com.daniel.community.post.repository.PostRepository;
 import com.daniel.community.user.repository.UserRepository;
@@ -21,14 +23,20 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final CommentRepository commentRepository;
+    private final PostLikeRepository postLikeRepository;
 
     // Repository를 통해 DB 접근
     public PostService(
             PostRepository postRepository,
-            UserRepository userRepository
+            UserRepository userRepository,
+            CommentRepository commentRepository,
+            PostLikeRepository postLikeRepository
     ) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
+        this.commentRepository = commentRepository;
+        this.postLikeRepository = postLikeRepository;
     }
 
     @Transactional
@@ -57,15 +65,19 @@ public class PostService {
         // cursor가 없으면 최신 게시글 10개를 가져옴
         if (cursor == null) {
             posts = postRepository.findTop10ByOrderByPostIdDesc();
-        // cursor가 있으면 해당 cursor 보다 이전 게시글 10개 가져옴
+            // cursor가 있으면 해당 cursor 보다 이전 게시글 10개 가져옴
         } else {
             posts = postRepository.findTop10ByPostIdLessThanOrderByPostIdDesc(cursor);
         }
 
         List<PostSummaryResponse> postResponses = new ArrayList<>();
 
+        // 게시글마다 좋아요와 댓글 수를 계산
         for (Post post : posts) {
-            postResponses.add(new PostSummaryResponse(post, 0));
+            int likes = postLikeRepository.countByPost(post);
+            int commentsCount = commentRepository.countByPost(post);
+
+            postResponses.add(new PostSummaryResponse(post, likes, commentsCount));
         }
 
         Long nextCursor = null;
@@ -88,7 +100,10 @@ public class PostService {
         // 상세 조회에서 게시글을 조회하면 조회수를 올림
         post.increaseViews();
 
-        return new PostDetailResponse(post, 0);
+        int likes = postLikeRepository.countByPost(post);
+        int commentsCount = commentRepository.countByPost(post);
+
+        return new PostDetailResponse(post, likes, commentsCount);
     }
 
     // 게시글 수정

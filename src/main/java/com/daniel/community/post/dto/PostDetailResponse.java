@@ -34,12 +34,12 @@ public class PostDetailResponse {
     private AuthorResponse author;
 
     // 게시글 자체의 정보는 Post에서 가져옴
-    public PostDetailResponse(Post post, int commentsCount) {
+    public PostDetailResponse(Post post, int likes, int commentsCount) {
         this.postId = post.getPostId();
         this.title = post.getTitle();
         this.content = post.getContent();
         this.postImage = post.getPostImage();
-        this.likes = post.getLikes();
+        this.likes = likes;
         this.views = post.getViews();
         this.commentsCount = commentsCount;
         this.createdAt = post.getCreatedAt().format(DATE_TIME_FORMATTER);

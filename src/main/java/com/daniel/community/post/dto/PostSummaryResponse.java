@@ -28,10 +28,10 @@ public class PostSummaryResponse {
 
     private AuthorResponse author;
 
-    public PostSummaryResponse(Post post, int commentsCount) {
+    public PostSummaryResponse(Post post, int likes, int commentsCount) {
         this.postId = post.getPostId();
         this.title = post.getTitle();
-        this.likes = post.getLikes();
+        this.likes = likes;
         this.commentsCount = commentsCount;
         this.views = post.getViews();
         this.createdAt = post.getCreatedAt().format(DATE_TIME_FORMATTER);
