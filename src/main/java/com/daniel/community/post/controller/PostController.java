@@ -1,12 +1,12 @@
 package com.daniel.community.post.controller;
 
 import com.daniel.community.global.response.ApiResponse;
+import com.daniel.community.global.security.CustomUserDetails;
 import com.daniel.community.post.dto.CreatePostRequest;
 import com.daniel.community.post.dto.CreatePostResponse;
 import com.daniel.community.post.dto.PostDetailResponse;
 import com.daniel.community.post.dto.PostListResponse;
 import com.daniel.community.post.dto.UpdatePostRequest;
-import com.daniel.community.global.security.CustomUserDetails;
 import com.daniel.community.post.service.PostService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -54,14 +54,9 @@ public class PostController {
 
     @GetMapping("/{postId}")
     public ResponseEntity<ApiResponse> getPost(@PathVariable Long postId) {
-        try {
-            PostDetailResponse response = postService.getPost(postId);
-            return ResponseEntity.ok(ApiResponse.success("get_post_detail_success", response));
-        } catch (IllegalArgumentException exception) {
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body(ApiResponse.error(exception.getMessage()));
-        }
+        PostDetailResponse response = postService.getPost(postId);
+
+        return ResponseEntity.ok(ApiResponse.success("get_post_detail_success", response));
     }
 
     @PatchMapping("/{postId}")
@@ -70,16 +65,9 @@ public class PostController {
             @Valid @RequestBody UpdatePostRequest request,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        try {
-            postService.updatePost(postId, request, userDetails.getUserId());
-            return ResponseEntity.ok(ApiResponse.success("update_post_success"));
-        } catch (IllegalArgumentException exception) {
-            HttpStatus status = getPostErrorStatus(exception.getMessage());
+        postService.updatePost(postId, request, userDetails.getUserId());
 
-            return ResponseEntity
-                    .status(status)
-                    .body(ApiResponse.error(exception.getMessage()));
-        }
+        return ResponseEntity.ok(ApiResponse.success("update_post_success"));
     }
 
     @DeleteMapping("/{postId}")
@@ -87,27 +75,8 @@ public class PostController {
             @PathVariable Long postId,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        try {
-            postService.deletePost(postId, userDetails.getUserId());
-            return ResponseEntity.ok(ApiResponse.success("delete_post_success"));
-        } catch (IllegalArgumentException exception) {
-            HttpStatus status = getPostErrorStatus(exception.getMessage());
+        postService.deletePost(postId, userDetails.getUserId());
 
-            return ResponseEntity
-                    .status(status)
-                    .body(ApiResponse.error(exception.getMessage()));
-        }
-    }
-
-    private HttpStatus getPostErrorStatus(String message) {
-        if ("forbidden".equals(message)) {
-            return HttpStatus.FORBIDDEN;
-        }
-
-        if ("unauthorized".equals(message)) {
-            return HttpStatus.UNAUTHORIZED;
-        }
-
-        return HttpStatus.NOT_FOUND;
+        return ResponseEntity.ok(ApiResponse.success("delete_post_success"));
     }
 }

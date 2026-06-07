@@ -26,48 +26,20 @@ public class ProfileImageController {
     public ResponseEntity<ApiResponse> uploadProfileImage(
             @Valid @RequestBody ProfileImageUploadRequest request
     ) {
-        try {
-            ProfileImageUploadResponse response =
-                    profileImageService.uploadProfileImage(request);
+        ProfileImageUploadResponse response =
+                profileImageService.uploadProfileImage(request);
 
-            return ResponseEntity
-                    .status(HttpStatus.CREATED)
-                    .body(ApiResponse.success("upload_success", response));
-        } catch (IllegalArgumentException exception) {
-            HttpStatus status = getProfileImageErrorStatus(exception.getMessage());
-
-            return ResponseEntity
-                    .status(status)
-                    .body(ApiResponse.error(exception.getMessage()));
-        }
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(ApiResponse.success("upload_success", response));
     }
 
     @DeleteMapping("/users/profile-images/{profileImageName}")
     public ResponseEntity<ApiResponse> deleteProfileImage(
             @PathVariable String profileImageName
     ) {
-        try {
-            profileImageService.deleteProfileImage(profileImageName);
+        profileImageService.deleteProfileImage(profileImageName);
 
-            return ResponseEntity.ok(ApiResponse.success("delete_success"));
-        } catch (IllegalArgumentException exception) {
-            HttpStatus status = getProfileImageErrorStatus(exception.getMessage());
-
-            return ResponseEntity
-                    .status(status)
-                    .body(ApiResponse.error(exception.getMessage()));
-        }
-    }
-
-    private HttpStatus getProfileImageErrorStatus(String message) {
-        if ("image_not_found".equals(message)) {
-            return HttpStatus.NOT_FOUND;
-        }
-
-        if ("internal_server_error".equals(message)) {
-            return HttpStatus.INTERNAL_SERVER_ERROR;
-        }
-
-        return HttpStatus.BAD_REQUEST;
+        return ResponseEntity.ok(ApiResponse.success("delete_success"));
     }
 }

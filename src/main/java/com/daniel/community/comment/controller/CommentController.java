@@ -32,41 +32,25 @@ public class CommentController {
 
     @GetMapping("/posts/{postId}/comments")
     public ResponseEntity<ApiResponse> getComments(@PathVariable Long postId) {
-        try {
-            List<CommentResponse> response = commentService.getComments(postId);
+        List<CommentResponse> response = commentService.getComments(postId);
 
-            return ResponseEntity.ok(
-                    ApiResponse.success("get_comments_success", response)
-            );
-        } catch (IllegalArgumentException exception) {
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body(ApiResponse.error(exception.getMessage()));
-        }
+        return ResponseEntity.ok(
+                ApiResponse.success("get_comments_success", response)
+        );
     }
 
     @PostMapping("/posts/{postId}/comments")
     public ResponseEntity<ApiResponse> createComment(
             @PathVariable Long postId,
             @Valid @RequestBody CreateCommentRequest request,
-            // 로그인한 사용자만 댓글 작성이 가능
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        try {
-            // 로그인한 사용자의 userId를 Service에 전달
-            CreateCommentResponse response =
-                    commentService.createComment(postId, request, userDetails.getUserId());
+        CreateCommentResponse response =
+                commentService.createComment(postId, request, userDetails.getUserId());
 
-            return ResponseEntity
-                    .status(HttpStatus.CREATED)
-                    .body(ApiResponse.success("create_comment_success", response));
-        } catch (IllegalArgumentException exception) {
-            HttpStatus status = getCommentErrorStatus(exception.getMessage());
-
-            return ResponseEntity
-                    .status(status)
-                    .body(ApiResponse.error(exception.getMessage()));
-        }
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(ApiResponse.success("create_comment_success", response));
     }
 
     @PatchMapping("/posts/{postId}/comments/{commentId}")
@@ -76,22 +60,14 @@ public class CommentController {
             @Valid @RequestBody UpdateCommentRequest request,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        try {
-            commentService.updateComment(
-                    postId,
-                    commentId,
-                    request,
-                    userDetails.getUserId()
-            );
+        commentService.updateComment(
+                postId,
+                commentId,
+                request,
+                userDetails.getUserId()
+        );
 
-            return ResponseEntity.ok(ApiResponse.success("update_comment_success"));
-        } catch (IllegalArgumentException exception) {
-            HttpStatus status = getCommentErrorStatus(exception.getMessage());
-
-            return ResponseEntity
-                    .status(status)
-                    .body(ApiResponse.error(exception.getMessage()));
-        }
+        return ResponseEntity.ok(ApiResponse.success("update_comment_success"));
     }
 
     @DeleteMapping("/posts/{postId}/comments/{commentId}")
@@ -100,28 +76,8 @@ public class CommentController {
             @PathVariable Long commentId,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        try {
-            commentService.deleteComment(postId, commentId, userDetails.getUserId());
+        commentService.deleteComment(postId, commentId, userDetails.getUserId());
 
-            return ResponseEntity.ok(ApiResponse.success("delete_comment_success"));
-        } catch (IllegalArgumentException exception) {
-            HttpStatus status = getCommentErrorStatus(exception.getMessage());
-
-            return ResponseEntity
-                    .status(status)
-                    .body(ApiResponse.error(exception.getMessage()));
-        }
-    }
-
-    private HttpStatus getCommentErrorStatus(String message) {
-        if ("unauthorized".equals(message)) {
-            return HttpStatus.UNAUTHORIZED;
-        }
-
-        if ("forbidden".equals(message)) {
-            return HttpStatus.FORBIDDEN;
-        }
-
-        return HttpStatus.NOT_FOUND;
+        return ResponseEntity.ok(ApiResponse.success("delete_comment_success"));
     }
 }
