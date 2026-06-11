@@ -1,6 +1,7 @@
 package com.daniel.community.global.config;
 
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -26,5 +27,22 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addResourceHandler(IMAGE_URL_PATTERN)
                 // 실제 파일 위치를 등록
                 .addResourceLocations("file:" + uploadPath + "/");
+    }
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        // 모든 API 경로에 CORS 설정 적용
+        registry.addMapping("/**")
+                .allowedOrigins(
+                        "http://localhost:3000",
+                        "http://127.0.0.1:3000",
+                        "http://localhost:5500",
+                        "http://127.0.0.1:5500"
+                )
+                .allowedMethods("GET", "POST", "PATCH", "DELETE", "OPTIONS")
+                .allowedHeaders("*")
+                .exposedHeaders("Authorization")
+                .allowCredentials(false)
+                .maxAge(3600);
     }
 }

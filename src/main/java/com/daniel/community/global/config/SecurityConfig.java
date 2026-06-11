@@ -35,6 +35,8 @@ public class SecurityConfig {
                 new JwtAuthenticationFilter(jwtTokenProvider, customUserDetailsService);
 
         return http
+                // CORS 설정
+                .cors(cors -> { })
                 .csrf(AbstractHttpConfigurer::disable)
                 // JWT 인증은 세션을 사용하지 않기 때문에 STATELESS 로 설정
                 .sessionManagement(session ->
