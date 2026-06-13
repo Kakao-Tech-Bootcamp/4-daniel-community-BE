@@ -52,6 +52,16 @@ public class PostController {
         return ResponseEntity.ok(ApiResponse.success("get_posts_success", response));
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<ApiResponse> searchPosts(
+            @RequestParam String keyword,
+            @RequestParam(required = false) Long cursor
+    ) {
+        PostListResponse response = postService.searchPosts(keyword, cursor);
+
+        return ResponseEntity.ok(ApiResponse.success("search_posts_success", response));
+    }
+
     @GetMapping("/{postId}")
     public ResponseEntity<ApiResponse> getPost(
             @PathVariable Long postId,
