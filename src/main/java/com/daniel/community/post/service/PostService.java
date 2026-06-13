@@ -95,15 +95,21 @@ public class PostService {
 
     // 게시글 상세 조회
     @Transactional
-    public PostDetailResponse getPost(Long postId) {
+    public PostDetailResponse getPost(Long postId, Long userId) {
         Post post = findPost(postId);
         // 상세 조회에서 게시글을 조회하면 조회수를 올림
         post.increaseViews();
 
         int likes = postLikeRepository.countByPost(post);
         int commentsCount = commentRepository.countByPost(post);
+        boolean isLiked = false;
 
-        return new PostDetailResponse(post, likes, commentsCount);
+        if (userId != null) {
+            User user = findUser(userId);
+            isLiked = postLikeRepository.existsByPostAndUser(post, user);
+        }
+
+        return new PostDetailResponse(post, likes, commentsCount, isLiked);
     }
 
     // 게시글 수정

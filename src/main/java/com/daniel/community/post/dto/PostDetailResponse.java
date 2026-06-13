@@ -28,13 +28,16 @@ public class PostDetailResponse {
     @JsonProperty("comments_count")
     private int commentsCount;
 
+    @JsonProperty("is_liked")
+    private boolean isLiked;
+
     @JsonProperty("created_at")
     private String createdAt;
 
     private AuthorResponse author;
 
     // 게시글 자체의 정보는 Post에서 가져옴
-    public PostDetailResponse(Post post, int likes, int commentsCount) {
+    public PostDetailResponse(Post post, int likes, int commentsCount, boolean isLiked) {
         this.postId = post.getPostId();
         this.title = post.getTitle();
         this.content = post.getContent();
@@ -42,6 +45,7 @@ public class PostDetailResponse {
         this.likes = likes;
         this.views = post.getViews();
         this.commentsCount = commentsCount;
+        this.isLiked = isLiked;
         this.createdAt = post.getCreatedAt().format(DATE_TIME_FORMATTER);
         this.author = new AuthorResponse(post.getUser());
     }
@@ -72,6 +76,10 @@ public class PostDetailResponse {
 
     public int getCommentsCount() {
         return commentsCount;
+    }
+
+    public boolean isLiked() {
+        return isLiked;
     }
 
     public String getCreatedAt() {
