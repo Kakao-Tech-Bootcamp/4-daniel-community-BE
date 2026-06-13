@@ -7,6 +7,7 @@ import com.daniel.community.user.dto.UpdateUserRequest;
 import com.daniel.community.user.dto.UserInfoResponse;
 import com.daniel.community.user.entity.User;
 import com.daniel.community.user.repository.UserRepository;
+import jakarta.persistence.EntityManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,13 +19,16 @@ public class UserService {
     private final UserRepository userRepository;
     // 비밀번호를 암호화하기 위한 필드
     private final PasswordEncoder passwordEncoder;
+    private final EntityManager entityManager;
 
     public UserService(
             UserRepository userRepository,
-            PasswordEncoder passwordEncoder
+            PasswordEncoder passwordEncoder,
+            EntityManager entityManager
     ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.entityManager = entityManager;
     }
 
     @Transactional
@@ -76,6 +80,45 @@ public class UserService {
         }
 
         user.updateProfile(request.getNickname(), request.getProfileImage());
+    }
+
+    @Transactional
+    public void deleteMyAccount(Long userId) {
+        User user = findUser(userId);
+
+        entityManager.createQuery(
+                        "delete from PostLike postLike where postLike.user = :user"
+                )
+                .setParameter("user", user)
+                .executeUpdate();
+
+        entityManager.createQuery(
+                        "delete from PostLike postLike where postLike.post in " +
+                                "(select post from Post post where post.user = :user)"
+                )
+                .setParameter("user", user)
+                .executeUpdate();
+
+        entityManager.createQuery(
+                        "delete from Comment comment where comment.user = :user"
+                )
+                .setParameter("user", user)
+                .executeUpdate();
+
+        entityManager.createQuery(
+                        "delete from Comment comment where comment.post in " +
+                                "(select post from Post post where post.user = :user)"
+                )
+                .setParameter("user", user)
+                .executeUpdate();
+
+        entityManager.createQuery(
+                        "delete from Post post where post.user = :user"
+                )
+                .setParameter("user", user)
+                .executeUpdate();
+
+        userRepository.delete(user);
     }
 
     @Transactional

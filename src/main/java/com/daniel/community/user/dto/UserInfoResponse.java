@@ -5,6 +5,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class UserInfoResponse {
 
+    @JsonProperty("user_id")
+    private Long userId;
+
     private String email;
 
     private String nickname;
@@ -14,9 +17,14 @@ public class UserInfoResponse {
 
     // 비밀번호는 응답에 미포함
     public UserInfoResponse(User user) {
+        this.userId = user.getUserId();
         this.email = user.getEmail();
         this.nickname = user.getNickname();
         this.profileImage = user.getProfileImage();
+    }
+
+    public Long getUserId() {
+        return userId;
     }
 
     public String getEmail() {

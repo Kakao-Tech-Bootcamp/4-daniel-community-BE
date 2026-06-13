@@ -54,9 +54,7 @@ public class User {
             this.nickname = nickname;
         }
 
-        if (profileImage != null) {
-            this.profileImage = profileImage;
-        }
+        this.profileImage = profileImage;
     }
 
     public void updatePassword(String password) {

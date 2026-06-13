@@ -43,6 +43,9 @@ public class SecurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(auth -> auth
+                        // CORS preflight 요청 허용
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
                         // 아래의 API는 누구나 접근 가능
                         .requestMatchers(HttpMethod.GET, "/posts").permitAll()
                         .requestMatchers(HttpMethod.GET, "/posts/{postId}").permitAll()
@@ -52,6 +55,8 @@ public class SecurityConfig {
                         .requestMatchers("/users/login").permitAll()
                         .requestMatchers("/users/emails/**").permitAll()
                         .requestMatchers("/users/nicknames/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/users/profile-images").permitAll()
+
                         // 그 외 API는 로그인해야 접근 가능
                         .anyRequest().authenticated()
                 )
