@@ -12,6 +12,8 @@ import com.daniel.community.post.repository.PostLikeRepository;
 import com.daniel.community.user.entity.User;
 import com.daniel.community.post.repository.PostRepository;
 import com.daniel.community.user.repository.UserRepository;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -70,27 +72,25 @@ public class PostService {
             posts = postRepository.findTop10ByPostIdLessThanOrderByPostIdDesc(cursor);
         }
 
-        List<PostSummaryResponse> postResponses = new ArrayList<>();
+        return createPostListResponse(posts);
+    }
 
-        // 게시글마다 좋아요와 댓글 수를 계산
-        for (Post post : posts) {
-            int likes = postLikeRepository.countByPost(post);
-            int commentsCount = commentRepository.countByPost(post);
-
-            postResponses.add(new PostSummaryResponse(post, likes, commentsCount));
+    @Transactional(readOnly = true)
+    public PostListResponse searchPosts(String keyword, Long cursor) {
+        if (keyword == null || keyword.isBlank()) {
+            return getPosts(cursor);
         }
 
-        Long nextCursor = null;
+        List<Post> posts;
+        Pageable limit = PageRequest.of(0, 10);
 
-        if (!posts.isEmpty()) {
-            Post lastPost = posts.get(posts.size() - 1);
-            nextCursor = lastPost.getPostId();
+        if (cursor == null) {
+            posts = postRepository.searchTop10ByKeyword(keyword, limit);
+        } else {
+            posts = postRepository.searchTop10ByKeywordAndCursor(keyword, cursor, limit);
         }
 
-        // 10개가 왔다면 뒤에 데이터가 더 있을 거라고 생각하고 true로 설정
-        boolean hasMore = posts.size() == 10;
-
-        return new PostListResponse(postResponses, nextCursor, hasMore);
+        return createPostListResponse(posts);
     }
 
     // 게시글 상세 조회
@@ -136,6 +136,30 @@ public class PostService {
         }
         // Entity의 delete 메서드 호출
         postRepository.delete(post);
+    }
+
+    private PostListResponse createPostListResponse(List<Post> posts) {
+        List<PostSummaryResponse> postResponses = new ArrayList<>();
+
+        // 게시글마다 좋아요와 댓글 수를 계산
+        for (Post post : posts) {
+            int likes = postLikeRepository.countByPost(post);
+            int commentsCount = commentRepository.countByPost(post);
+
+            postResponses.add(new PostSummaryResponse(post, likes, commentsCount));
+        }
+
+        Long nextCursor = null;
+
+        if (!posts.isEmpty()) {
+            Post lastPost = posts.get(posts.size() - 1);
+            nextCursor = lastPost.getPostId();
+        }
+
+        // 10개가 왔다면 뒤에 데이터가 더 있을 거라고 생각하고 true로 설정
+        boolean hasMore = posts.size() == 10;
+
+        return new PostListResponse(postResponses, nextCursor, hasMore);
     }
 
     // 게시글 탐색
