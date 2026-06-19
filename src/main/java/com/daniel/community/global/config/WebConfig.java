@@ -51,6 +51,7 @@ public class WebConfig implements WebMvcConfigurer {
         // 모든 API 경로에 CORS 설정 적용
         registry.addMapping("/**")
                 .allowedOrigins(
+                        "http://16.176.158.49",
                         "http://localhost:3000",
                         "http://127.0.0.1:3000",
                         "http://localhost:5500",
