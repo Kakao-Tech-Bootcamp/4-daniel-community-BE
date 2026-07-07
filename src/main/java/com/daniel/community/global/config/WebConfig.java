@@ -51,14 +51,15 @@ public class WebConfig implements WebMvcConfigurer {
         // 모든 API 경로에 CORS 설정 적용
         registry.addMapping("/**")
                 .allowedOrigins(
-                        "http://16.176.158.49",
-                        "http://localhost:3000",
-                        "http://127.0.0.1:3000",
-                        "http://localhost:5500",
-                        "http://127.0.0.1:5500",
-                        "http://localhost:8080",
-                        "http://127.0.0.1:8080"
-                )
+			"http://daniel-community.cloud",
+                        "http://www.daniel-community.cloud",
+                        "https://daniel-community.cloud",
+                        "https://www.daniel-community.cloud",
+                        "http://kakaotechbootcamp-alb-1952851456.ap-northeast-2.elb.amazonaws.com",
+                        "http://3.39.227.234",
+        		"http://localhost:8080",
+        		"http://127.0.0.1:8080"
+		)
                 .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
                 .exposedHeaders("Authorization")
