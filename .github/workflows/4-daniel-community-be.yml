@@ -41,11 +41,11 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            docker pull ${{ secrets.DOCKER_USERNAME }}/daniel-community-be:latest
-            docker stop daniel-community-be || true
-            docker rm daniel-community-be || true
+            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/daniel-community-be:latest
+            sudo docker stop daniel-community-be || true
+            sudo docker rm daniel-community-be || true
             mkdir -p ~/community/uploads
-            docker run -d \
+            sudo docker run -d \
               --name daniel-community-be \
               --restart unless-stopped \
               -p 3000:3000 \
