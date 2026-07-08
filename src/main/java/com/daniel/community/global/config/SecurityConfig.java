@@ -3,6 +3,7 @@ package com.daniel.community.global.config;
 import com.daniel.community.global.security.CustomUserDetailsService;
 import com.daniel.community.global.security.JwtAuthenticationFilter;
 import com.daniel.community.global.security.JwtTokenProvider;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -41,6 +42,11 @@ public class SecurityConfig {
                 // JWT 인증은 세션을 사용하지 않기 때문에 STATELESS 로 설정
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint((request, response, authException) ->
+                                response.sendError(HttpServletResponse.SC_UNAUTHORIZED)
+                        )
                 )
                 .authorizeHttpRequests(auth -> auth
                         // CORS preflight 요청 허용
