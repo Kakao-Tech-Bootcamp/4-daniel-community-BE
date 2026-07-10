@@ -62,9 +62,9 @@ jobs:
                 --name ${CONTAINER_NAME} \
                 --restart unless-stopped \
                 -p 3000:3000 \
-                -e DB_URL='${DB_URL}' \
-                -e DB_USERNAME='${DB_USERNAME}' \
-                -e DB_PASSWORD='${DB_PASSWORD}' \
+                -e DB_URL=${DB_URL} \
+                -e DB_USERNAME=${DB_USERNAME} \
+                -e DB_PASSWORD=${DB_PASSWORD} \
                 -v ${UPLOAD_DIR}:/app/uploads \
                 ${IMAGE_NAME}
             " \
