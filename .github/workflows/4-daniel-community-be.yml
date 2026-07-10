@@ -7,7 +7,7 @@ on:
 env:
   IMAGE_NAME: ${{ secrets.DOCKER_USERNAME }}/daniel-community-be:latest
   CONTAINER_NAME: daniel-community-be
-  UPLOAD_DIR: /home/ubuntu/community/uploads
+  UPLOAD_DIR: /home/ubuntu/4-daniel-community-BE/uploads
 
 jobs:
   build:
