@@ -49,17 +49,28 @@ jobs:
           DB_USERNAME: ${{ secrets.DB_USERNAME }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
         run: |
+          DEPLOY_SCRIPT=$(cat <<EOF
+          sudo docker pull ${IMAGE_NAME}
+          sudo docker stop ${CONTAINER_NAME} || true
+          sudo docker rm ${CONTAINER_NAME} || true
+          sudo mkdir -p ${UPLOAD_DIR}
+          sudo docker run -d \
+            --name ${CONTAINER_NAME} \
+            --restart unless-stopped \
+            -p 3000:3000 \
+            -e DB_URL="${DB_URL}" \
+            -e DB_USERNAME="${DB_USERNAME}" \
+            -e DB_PASSWORD="${DB_PASSWORD}" \
+            -v ${UPLOAD_DIR}:/app/uploads \
+            ${IMAGE_NAME}
+          EOF
+          )
+
           command_id=$(aws ssm send-command \
             --instance-ids "$INSTANCE_ID" \
             --document-name "AWS-RunShellScript" \
             --comment "Deploy daniel-community-be container" \
-            --parameters commands="
-              sudo docker pull ${IMAGE_NAME}
-              sudo docker stop ${CONTAINER_NAME} || true
-              sudo docker rm ${CONTAINER_NAME} || true
-              mkdir -p ${UPLOAD_DIR}
-              sudo docker run -d --name ${CONTAINER_NAME} --restart unless-stopped -p 3000:3000 -e DB_URL=${DB_URL} -e DB_USERNAME=${DB_USERNAME} -e DB_PASSWORD=${DB_PASSWORD} -v ${UPLOAD_DIR}:/app/uploads ${IMAGE_NAME}
-            " \
+            --parameters commands="$DEPLOY_SCRIPT" \
             --query "Command.CommandId" \
             --output text)
 
