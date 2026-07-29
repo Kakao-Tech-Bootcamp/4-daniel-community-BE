@@ -1,0 +1,65 @@
+Daniel Community backend has been deployed.
+
+Release:
+  Name: {{ .Release.Name }}
+  Namespace: {{ .Release.Namespace }}
+
+Check the Deployment and Pods:
+
+  kubectl get deployment \
+    --namespace {{ .Release.Namespace }} \
+    {{ include "daniel-community.fullname" . }}
+
+  kubectl get pods \
+    --namespace {{ .Release.Namespace }} \
+    -l app.kubernetes.io/instance={{ .Release.Name }} \
+    -o wide
+
+Check the existing Secret without displaying its values:
+
+  kubectl get secret \
+    --namespace {{ .Release.Namespace }} \
+    {{ .Values.secret.existingSecret }}
+
+Check the Service:
+
+  kubectl get service \
+    --namespace {{ .Release.Namespace }} \
+    {{ include "daniel-community.fullname" . }}
+
+{{- if .Values.ingress.enabled }}
+
+Ingress is enabled.
+
+  Host: {{ .Values.ingress.host }}
+  Path: {{ .Values.ingress.path }}
+
+Check the Ingress:
+
+  kubectl get ingress \
+    --namespace {{ .Release.Namespace }} \
+    {{ include "daniel-community.fullname" . }}
+
+The ingress-nginx controller is exposed through NodePort.
+Confirm its current HTTP NodePort before testing:
+
+  kubectl get service \
+    --namespace ingress-nginx \
+    ingress-nginx-controller
+
+{{- else }}
+
+Ingress is disabled.
+
+For a temporary local test, run:
+
+  kubectl port-forward \
+    --namespace {{ .Release.Namespace }} \
+    service/{{ include "daniel-community.fullname" . }} \
+    3000:{{ .Values.service.port }}
+
+Then test:
+
+  curl -i http://127.0.0.1:3000/posts
+
+{{- end }}

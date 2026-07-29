@@ -1,0 +1,7 @@
+apiVersion: v2
+name: daniel-community
+description: Helm chart for the Daniel Community Spring Boot backend
+type: application
+version: 0.1.0
+appVersion: "v1.0.1"
+kubeVersion: ">=1.30.0-0"

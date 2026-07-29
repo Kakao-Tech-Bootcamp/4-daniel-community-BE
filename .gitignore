@@ -35,3 +35,22 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Local OS files ###
+.DS_Store
+**/.DS_Store
+
+### Logs and local environment ###
+*.log
+.env
+.env.*
+!.env.example
+
+### Secrets and credentials ###
+*.pem
+*.key
+*.p12
+*.pfx
+values-secret*.yaml
+secret*.yaml
+kubeconfig*

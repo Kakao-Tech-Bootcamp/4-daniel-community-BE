@@ -1,0 +1,90 @@
+replicaCount: 2
+
+image:
+  repository: circlepaper/daniel-community-be
+  tag: v1.0.1
+  pullPolicy: IfNotPresent
+
+nameOverride: ""
+fullnameOverride: ""
+
+deployment:
+  revisionHistoryLimit: 5
+  progressDeadlineSeconds: 300
+  minReadySeconds: 10
+
+strategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxUnavailable: 0
+    maxSurge: 1
+
+container:
+  port: 3000
+
+pod:
+  terminationGracePeriodSeconds: 30
+
+config:
+  SERVER_PORT: "3000"
+  SPRING_APPLICATION_NAME: "daniel-community-be"
+
+secret:
+  existingSecret: community-db-secret
+  keys:
+    dbUrl: DB_URL
+    dbUsername: DB_USERNAME
+    dbPassword: DB_PASSWORD
+
+service:
+  type: ClusterIP
+  port: 3000
+
+ingress:
+  enabled: false
+  className: nginx
+  annotations: {}
+  host: daniel-community.local
+  path: /
+  pathType: Prefix
+
+probes:
+  startup:
+    enabled: true
+    path: /posts
+    periodSeconds: 5
+    timeoutSeconds: 3
+    failureThreshold: 30
+
+  readiness:
+    enabled: true
+    path: /posts
+    periodSeconds: 5
+    timeoutSeconds: 3
+    successThreshold: 1
+    failureThreshold: 3
+
+  liveness:
+    enabled: true
+    periodSeconds: 20
+    timeoutSeconds: 3
+    failureThreshold: 3
+
+resources:
+  requests:
+    cpu: 200m
+    memory: 256Mi
+  limits:
+    cpu: "1"
+    memory: 768Mi
+
+uploads:
+  enabled: true
+  mountPath: /app/uploads
+  emptyDir: {}
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
