@@ -4,3 +4,6 @@ ingress:
   host: daniel-community.local
   path: /
   pathType: Prefix
+
+config:
+  GITOPS_MANAGED_BY: argocd
