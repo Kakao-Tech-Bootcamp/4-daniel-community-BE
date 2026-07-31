@@ -1,0 +1,30 @@
+grafana:
+  enabled: false
+
+loki:
+  nodeSelector:
+    monitoring: "yes"
+  persistence:
+    enabled: true
+    size: 2Gi
+    storageClassName: local-path
+
+promtail:
+  enabled: true
+  nodeSelector:
+    logging: promtail
+
+  resources:
+    requests:
+      cpu: 20m
+      memory: 64Mi
+    limits:
+      cpu: 100m
+      memory: 128Mi
+
+  config:
+    clients:
+      - url: http://loki.monitoring.svc.cluster.local:3100/loki/api/v1/push
+    snippets:
+      pipelineStages:
+        - docker: {}

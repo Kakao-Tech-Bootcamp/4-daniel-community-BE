@@ -1,0 +1,62 @@
+replicas: 1
+
+deploymentStrategy:
+  type: Recreate
+
+admin:
+  existingSecret: grafana-admin-credentials
+  userKey: admin-user
+  passwordKey: admin-password
+
+datasources:
+  datasources.yaml:
+    apiVersion: 1
+    datasources:
+      - access: proxy
+        isDefault: true
+        name: Prometheus
+        type: prometheus
+        url: http://prometheus-server.monitoring.svc.cluster.local
+
+      - access: proxy
+        isDefault: false
+        name: Loki
+        type: loki
+        url: http://loki.monitoring.svc.cluster.local:3100
+
+nodeSelector:
+  monitoring: "yes"
+
+persistence:
+  enabled: true
+  size: 1Gi
+  storageClassName: local-path
+
+service:
+  type: NodePort
+  port: 80
+  nodePort: 30091
+
+initChownData:
+  securityContext:
+    capabilities:
+      add:
+        - CHOWN
+        - DAC_OVERRIDE
+      drop:
+        - ALL
+  resources:
+    requests:
+      cpu: 10m
+      memory: 32Mi
+    limits:
+      cpu: 50m
+      memory: 64Mi
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 128Mi
+  limits:
+    cpu: 250m
+    memory: 384Mi
