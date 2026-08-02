@@ -2,8 +2,14 @@ grafana:
   enabled: false
 
 loki:
+  podAnnotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/path: "/metrics"
+    prometheus.io/port: "3100"
+
   nodeSelector:
     monitoring: "yes"
+
   persistence:
     enabled: true
     size: 2Gi
