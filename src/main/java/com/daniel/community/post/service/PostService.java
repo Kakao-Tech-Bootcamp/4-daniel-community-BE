@@ -63,7 +63,6 @@ public class PostService {
         return new CreatePostResponse(savedPost.getPostId());
     }
 
-
     @Transactional(readOnly = true)
     public PostListResponse getPosts(Long cursor) {
         List<PostSummaryResponse> posts =
@@ -75,7 +74,6 @@ public class PostService {
 
         return createPostListResponse(posts);
     }
-
 
     @Transactional(readOnly = true)
     public PostListResponse searchPosts(
@@ -96,30 +94,31 @@ public class PostService {
         return createPostListResponse(posts);
     }
 
-
     @Transactional
     public PostDetailResponse getPost(
             Long postId,
             Long userId
     ) {
+        int updatedRows = postRepository.increaseViews(postId);
+
+        if (updatedRows == 0) {
+            throw new IllegalArgumentException("post_not_found");
+        }
+
         Post post = findPost(postId);
 
-        post.increaseViews();
-
         int likes = postLikeRepository.countByPost(post);
-        int commentsCount =
-                commentRepository.countByPost(post);
+        int commentsCount = commentRepository.countByPost(post);
 
         boolean isLiked = false;
 
         if (userId != null) {
             User user = findUser(userId);
 
-            isLiked =
-                    postLikeRepository.existsByPostAndUser(
-                            post,
-                            user
-                    );
+            isLiked = postLikeRepository.existsByPostAndUser(
+                    post,
+                    user
+            );
         }
 
         return new PostDetailResponse(
@@ -129,7 +128,6 @@ public class PostService {
                 isLiked
         );
     }
-
 
     @Transactional
     public void updatePost(
@@ -150,7 +148,6 @@ public class PostService {
         );
     }
 
-
     @Transactional
     public void deletePost(
             Long postId,
@@ -164,7 +161,6 @@ public class PostService {
 
         postRepository.delete(post);
     }
-
 
     private PostListResponse createPostListResponse(
             List<PostSummaryResponse> queriedPosts
