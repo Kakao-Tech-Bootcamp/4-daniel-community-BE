@@ -9,11 +9,10 @@ import com.daniel.community.post.dto.PostSummaryResponse;
 import com.daniel.community.post.dto.UpdatePostRequest;
 import com.daniel.community.post.entity.Post;
 import com.daniel.community.post.repository.PostLikeRepository;
-import com.daniel.community.user.entity.User;
+import com.daniel.community.post.repository.PostQueryRepository;
 import com.daniel.community.post.repository.PostRepository;
+import com.daniel.community.user.entity.User;
 import com.daniel.community.user.repository.UserRepository;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,27 +22,33 @@ import java.util.List;
 @Service
 public class PostService {
 
+    private static final int POST_PAGE_SIZE = 10;
+
     private final PostRepository postRepository;
+    private final PostQueryRepository postQueryRepository;
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
     private final PostLikeRepository postLikeRepository;
 
-    // Repository를 통해 DB 접근
     public PostService(
             PostRepository postRepository,
+            PostQueryRepository postQueryRepository,
             UserRepository userRepository,
             CommentRepository commentRepository,
             PostLikeRepository postLikeRepository
     ) {
         this.postRepository = postRepository;
+        this.postQueryRepository = postQueryRepository;
         this.userRepository = userRepository;
         this.commentRepository = commentRepository;
         this.postLikeRepository = postLikeRepository;
     }
 
     @Transactional
-    // createPostRequest에서 값을 꺼내 Post 엔티티를 생성
-    public CreatePostResponse createPost(CreatePostRequest request, Long userId) {
+    public CreatePostResponse createPost(
+            CreatePostRequest request,
+            Long userId
+    ) {
         User user = findUser(userId);
 
         Post post = new Post(
@@ -55,124 +60,165 @@ public class PostService {
 
         Post savedPost = postRepository.save(post);
 
-        // 저장 이후에 생성된 게시물의 ID를 응답으로 반환
         return new CreatePostResponse(savedPost.getPostId());
     }
 
-    // 게시글 목록 조회
+
     @Transactional(readOnly = true)
     public PostListResponse getPosts(Long cursor) {
-        List<Post> posts;
-
-        // cursor가 없으면 최신 게시글 10개를 가져옴
-        if (cursor == null) {
-            posts = postRepository.findTop10ByOrderByPostIdDesc();
-            // cursor가 있으면 해당 cursor 보다 이전 게시글 10개 가져옴
-        } else {
-            posts = postRepository.findTop10ByPostIdLessThanOrderByPostIdDesc(cursor);
-        }
+        List<PostSummaryResponse> posts =
+                postQueryRepository.findPostSummaries(
+                        cursor,
+                        null,
+                        POST_PAGE_SIZE
+                );
 
         return createPostListResponse(posts);
     }
 
+
     @Transactional(readOnly = true)
-    public PostListResponse searchPosts(String keyword, Long cursor) {
+    public PostListResponse searchPosts(
+            String keyword,
+            Long cursor
+    ) {
         if (keyword == null || keyword.isBlank()) {
             return getPosts(cursor);
         }
 
-        List<Post> posts;
-        Pageable limit = PageRequest.of(0, 10);
-
-        if (cursor == null) {
-            posts = postRepository.searchTop10ByKeyword(keyword, limit);
-        } else {
-            posts = postRepository.searchTop10ByKeywordAndCursor(keyword, cursor, limit);
-        }
+        List<PostSummaryResponse> posts =
+                postQueryRepository.findPostSummaries(
+                        cursor,
+                        keyword,
+                        POST_PAGE_SIZE
+                );
 
         return createPostListResponse(posts);
     }
 
-    // 게시글 상세 조회
+
     @Transactional
-    public PostDetailResponse getPost(Long postId, Long userId) {
+    public PostDetailResponse getPost(
+            Long postId,
+            Long userId
+    ) {
         Post post = findPost(postId);
-        // 상세 조회에서 게시글을 조회하면 조회수를 올림
+
         post.increaseViews();
 
         int likes = postLikeRepository.countByPost(post);
-        int commentsCount = commentRepository.countByPost(post);
+        int commentsCount =
+                commentRepository.countByPost(post);
+
         boolean isLiked = false;
 
         if (userId != null) {
             User user = findUser(userId);
-            isLiked = postLikeRepository.existsByPostAndUser(post, user);
+
+            isLiked =
+                    postLikeRepository.existsByPostAndUser(
+                            post,
+                            user
+                    );
         }
 
-        return new PostDetailResponse(post, likes, commentsCount, isLiked);
+        return new PostDetailResponse(
+                post,
+                likes,
+                commentsCount,
+                isLiked
+        );
     }
 
-    // 게시글 수정
+
     @Transactional
-    public void updatePost(Long postId, UpdatePostRequest request, Long userId) {
+    public void updatePost(
+            Long postId,
+            UpdatePostRequest request,
+            Long userId
+    ) {
         Post post = findPost(postId);
 
-        // 게시글의 작성자인지 확인
         if (!post.isWrittenBy(userId)) {
             throw new IllegalArgumentException("forbidden");
         }
-        // Entity의 update 메서드 호출
-        post.update(request.getTitle(), request.getContent(), request.getPostImage());
+
+        post.update(
+                request.getTitle(),
+                request.getContent(),
+                request.getPostImage()
+        );
     }
 
-    // 게시글 삭제
+
     @Transactional
-    public void deletePost(Long postId, Long userId) {
+    public void deletePost(
+            Long postId,
+            Long userId
+    ) {
         Post post = findPost(postId);
 
-        // 게시글의 작성자인지 확인
         if (!post.isWrittenBy(userId)) {
             throw new IllegalArgumentException("forbidden");
         }
-        // Entity의 delete 메서드 호출
+
         postRepository.delete(post);
     }
 
-    private PostListResponse createPostListResponse(List<Post> posts) {
-        List<PostSummaryResponse> postResponses = new ArrayList<>();
 
-        // 게시글마다 좋아요와 댓글 수를 계산
-        for (Post post : posts) {
-            int likes = postLikeRepository.countByPost(post);
-            int commentsCount = commentRepository.countByPost(post);
+    private PostListResponse createPostListResponse(
+            List<PostSummaryResponse> queriedPosts
+    ) {
+        boolean hasMore =
+                queriedPosts.size() > POST_PAGE_SIZE;
 
-            postResponses.add(new PostSummaryResponse(post, likes, commentsCount));
-        }
+        int responseSize =
+                Math.min(
+                        queriedPosts.size(),
+                        POST_PAGE_SIZE
+                );
+
+        List<PostSummaryResponse> responsePosts =
+                new ArrayList<>(
+                        queriedPosts.subList(
+                                0,
+                                responseSize
+                        )
+                );
 
         Long nextCursor = null;
 
-        if (!posts.isEmpty()) {
-            Post lastPost = posts.get(posts.size() - 1);
+        if (!responsePosts.isEmpty()) {
+            PostSummaryResponse lastPost =
+                    responsePosts.get(
+                            responsePosts.size() - 1
+                    );
+
             nextCursor = lastPost.getPostId();
         }
 
-        // 10개가 왔다면 뒤에 데이터가 더 있을 거라고 생각하고 true로 설정
-        boolean hasMore = posts.size() == 10;
-
-        return new PostListResponse(postResponses, nextCursor, hasMore);
+        return new PostListResponse(
+                responsePosts,
+                nextCursor,
+                hasMore
+        );
     }
 
-    // 게시글 탐색
     private Post findPost(Long postId) {
         return postRepository.findById(postId)
-                // 게시글이 없을 경우 예외 처리
-                .orElseThrow(() -> new IllegalArgumentException("post_not_found"));
+                .orElseThrow(
+                        () -> new IllegalArgumentException(
+                                "post_not_found"
+                        )
+                );
     }
 
-    // 사용자 탐색
     private User findUser(Long userId) {
         return userRepository.findById(userId)
-                // 사용자가 없을 경우 예외 처리
-                .orElseThrow(() -> new IllegalArgumentException("unauthorized"));
+                .orElseThrow(
+                        () -> new IllegalArgumentException(
+                                "unauthorized"
+                        )
+                );
     }
 }

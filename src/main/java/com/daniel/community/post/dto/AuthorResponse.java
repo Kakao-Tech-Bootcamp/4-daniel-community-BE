@@ -13,10 +13,21 @@ public class AuthorResponse {
     @JsonProperty("profile_image")
     private String profileImage;
 
+
     public AuthorResponse(User user) {
         this.userId = user.getUserId();
         this.nickname = user.getNickname();
         this.profileImage = user.getProfileImage();
+    }
+
+    public AuthorResponse(
+            Long userId,
+            String nickname,
+            String profileImage
+    ) {
+        this.userId = userId;
+        this.nickname = nickname;
+        this.profileImage = profileImage;
     }
 
     public Long getUserId() {
