@@ -4,6 +4,9 @@ import com.daniel.community.post.entity.Post;
 import com.daniel.community.post.entity.PostLike;
 import com.daniel.community.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
 
@@ -17,4 +20,28 @@ public interface PostLikeRepository extends JpaRepository<PostLike, Long> {
 
     // 해당 게시글의 좋아요 개수 조회
     int countByPost(Post post);
+
+
+    @Modifying
+    @Query(
+            value = """
+                    INSERT INTO post_likes (
+                        post_id,
+                        user_id,
+                        created_at
+                    )
+                    VALUES (
+                        :postId,
+                        :userId,
+                        CURRENT_TIMESTAMP
+                    )
+                    ON DUPLICATE KEY UPDATE
+                        post_like_id = post_like_id
+                    """,
+            nativeQuery = true
+    )
+    int insertIfAbsent(
+            @Param("postId") Long postId,
+            @Param("userId") Long userId
+    );
 }

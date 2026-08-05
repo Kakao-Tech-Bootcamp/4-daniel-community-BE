@@ -27,22 +27,13 @@ public class PostLikeService {
     }
 
     @Transactional
-    public int likePost(Long postId, Long userId) {
-        // 게시글과 사용자를 탐색
-        Post post = findPost(postId);
-        User user = findUser(userId);
+    public void likePost(Long postId, Long userId) {
+        // 존재하지 않는 게시글과 사용자는 기존과 동일하게 예외처리
+        findPost(postId);
+        findUser(userId);
 
-        // 이미 좋아요를 눌렀다면 현재 좋아요 수 반환
-        if (postLikeRepository.existsByPostAndUser(post, user)) {
-            return postLikeRepository.countByPost(post);
-        }
-
-        // 좋아요가 없으면 새 PostLike를 생성
-        PostLike postLike = new PostLike(post, user);
-
-        postLikeRepository.save(postLike);
-
-        return postLikeRepository.countByPost(post);
+        // 이미 좋아요가 존재하면 정상종료
+        postLikeRepository.insertIfAbsent(postId, userId);
     }
 
     @Transactional
