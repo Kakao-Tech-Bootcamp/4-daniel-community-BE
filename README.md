@@ -1,4 +1,4 @@
-# DANIEL'S COMMUNITY
+# Daniel's Community
 > 사용자들이 게시글과 댓글을 작성하고 좋아요를 통해 소통할 수 있는
 > SpringBoot 기반 REST API 커뮤니티 서비스입니다.
 
