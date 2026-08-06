@@ -53,6 +53,15 @@ src/main/java/com/daniel/community
 
 <br>
 
+## ERD & VPC
+<p align="center">
+  <img src="docs/images/ER Diagram.png" alt="ERD" width="68%">
+    &nbsp;&nbsp;
+  <img src="docs/images/VPC Architecture.png" alt="VPC" width="30%">
+</p>
+
+<br>
+
 ## API 목록
 [Daniel's Community REST API](https://docs.google.com/spreadsheets/d/16pu0hmGkYhMrjpo1Jyw5POYPdBZY3jD2GQdoi-egTG0/edit?gid=1878554884#gid=1878554884)
 
