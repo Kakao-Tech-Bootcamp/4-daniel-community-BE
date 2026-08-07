@@ -131,27 +131,27 @@ docker run -d \
 <br>
 
 ### Kubernetes
-
-DB 접속 정보를 Secret으로 생성합니다.
 ```bash
 kubectl create secret generic daniel-community-secret \
   --from-literal=DB_URL="jdbc:mysql://mysql-host:3306/community" \
   --from-literal=DB_USERNAME="daniel" \
   --from-literal=DB_PASSWORD="password"
 ```
+DB 접속 정보를 Secret으로 생성합니다.
 <br>
 
-Helm으로 애플리케이션을 배포합니다.
 ```bash
 helm upgrade --install daniel-community \
   ./deploy/helm/daniel-community \
   --set image.repository="<DOCKERHUB_USERNAME>/daniel-community-be" \
   --set image.tag="latest"
 ```
+Helm으로 애플리케이션을 배포합니다.
 <br>
 
-배포 상태를 확인합니다.
 ```bash
 kubectl get pods
 kubectl rollout status deployment/daniel-community
 ```
+배포 상태를 확인합니다.
+
