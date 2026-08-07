@@ -53,12 +53,9 @@ src/main/java/com/daniel/community
 
 <br>
 
-## ERD & VPC
-<p align="center">
-  <img src="docs/images/ER Diagram.png" alt="ERD" width="68%">
-    &nbsp;&nbsp;
-  <img src="docs/images/VPC Architecture.png" alt="VPC" width="30%">
-</p>
+## 아키텍처
+<img src="docs/images/Architecture.png" width="1100">
+
 
 <br>
 
@@ -125,7 +122,7 @@ docker run -d \
   --name daniel-community-be \
   -p 3000:3000 \
   -e DB_URL="jdbc:mysql://host.docker.internal:3306/community" \
-  -e DB_USERNAME="community" \
+  -e DB_USERNAME="daniel" \
   -e DB_PASSWORD="password" \
   -v "$(pwd)/uploads:/app/uploads" \
   daniel-community-be
@@ -139,7 +136,7 @@ DB 접속 정보를 Secret으로 생성합니다.
 ```bash
 kubectl create secret generic daniel-community-secret \
   --from-literal=DB_URL="jdbc:mysql://mysql-host:3306/community" \
-  --from-literal=DB_USERNAME="community" \
+  --from-literal=DB_USERNAME="daniel" \
   --from-literal=DB_PASSWORD="password"
 ```
 <br>
