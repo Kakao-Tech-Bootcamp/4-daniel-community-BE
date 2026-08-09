@@ -1,6 +1,6 @@
 # KakaoTech Bootcamp Hub
 
-![landing.png](docs%2Fimages%2Flanding.png)
+[![landing.png](docs%2Fimages%2Flanding.png)](https://github.com/user-attachments/assets/6a66ad63-29ab-42e5-a399-8a6f12b092f1)
 
 > 카카오테크 부트캠프의 소식과 학생들의 이야기가 모이는 커뮤니티 백엔드입니다 <br>
 > 학생들은 게시글을 작성하고 댓글과 좋아요로 소통하며 프로필과 계정을 관리할 수 있습니다
@@ -119,5 +119,3 @@ src/main/java/com/daniel/community
 |  | `POST` | `/posts/{postId}/comments` | 댓글 작성 |
 |  | `PATCH` | `/posts/{postId}/comments/{commentId}` | 댓글 수정 | 
 |  | `DELETE` | `/posts/{postId}/comments/{commentId}` | 댓글 삭제 | 
-
-
