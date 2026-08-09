@@ -90,34 +90,34 @@ src/main/java/com/daniel/community
 ## API 목록
 [Daniel's Community REST API](https://docs.google.com/spreadsheets/d/16pu0hmGkYhMrjpo1Jyw5POYPdBZY3jD2GQdoi-egTG0/edit?gid=1878554884#gid=1878554884)
 
-| 구분 | Method | Endpoint | 설명 | 인증 |
-|---|---|---|---|:---:|
-| 회원 | `POST` | `/users/signup` | 회원가입 | X |
-|  | `GET` | `/users/me` | 내 정보 조회 | O |
-|  | `PATCH` | `/users/me` | 내 정보 수정 | O |
-|  | `DELETE` | `/users/me` | 회원 탈퇴 | O |
-|  | `PATCH` | `/users/me/password` | 비밀번호 변경 | O |
-|  | `GET` | `/users/emails/{email}` | 이메일 중복 확인 | X |
-|  | `GET` | `/users/nicknames/{nickname}` | 닉네임 중복 확인 | X |
-| 인증 | `POST` | `/users/login` | 로그인 및 JWT 발급 | X |
-|  | `DELETE` | `/users/logout` | 로그아웃 | O |
-| 프로필 이미지 | `POST` | `/users/profile-images` | 프로필 이미지 업로드 | X |
-|  | `DELETE` | `/users/profile-images/{profileImageName}` | 프로필 이미지 삭제 | O |
-|  | `GET` | `/images/profiles/{fileName}` | 프로필 이미지 조회 | X |
-| 게시글 | `POST` | `/posts` | 게시글 작성 | O |
-|  | `GET` | `/posts` | 게시글 목록 조회 | X |
-|  | `GET` | `/posts?cursor={postId}` | 커서 기반 게시글 목록 조회 | X |
-|  | `GET` | `/posts/search?keyword={keyword}` | 게시글 검색 | X |
-|  | `GET` | `/posts/{postId}` | 게시글 상세 조회 | X |
-|  | `PATCH` | `/posts/{postId}` | 게시글 수정 | O |
-|  | `DELETE` | `/posts/{postId}` | 게시글 삭제 | O |
-| 게시글 이미지 | `POST` | `/posts/images` | 게시글 이미지 업로드 | O |
-|  | `GET` | `/images/posts/{fileName}` | 게시글 이미지 조회 | X |
-| 좋아요 | `POST` | `/posts/{postId}/likes` | 게시글 좋아요 | O |
-|  | `DELETE` | `/posts/{postId}/likes` | 게시글 좋아요 취소 | O |
-| 댓글 | `GET` | `/posts/{postId}/comments` | 댓글 목록 조회 | X |
-|  | `POST` | `/posts/{postId}/comments` | 댓글 작성 | O |
-|  | `PATCH` | `/posts/{postId}/comments/{commentId}` | 댓글 수정 | O |
-|  | `DELETE` | `/posts/{postId}/comments/{commentId}` | 댓글 삭제 | O |
+| 구분 | Method | Endpoint | 설명 |
+|---|---|---|---|
+| 회원 | `POST` | `/users/signup` | 회원가입 |
+|  | `GET` | `/users/me` | 내 정보 조회 |
+|  | `PATCH` | `/users/me` | 내 정보 수정 |
+|  | `DELETE` | `/users/me` | 회원 탈퇴 |
+|  | `PATCH` | `/users/me/password` | 비밀번호 변경 |
+|  | `GET` | `/users/emails/{email}` | 이메일 중복 확인 |
+|  | `GET` | `/users/nicknames/{nickname}` | 닉네임 중복 확인 |
+| 인증 | `POST` | `/users/login` | 로그인 및 JWT 발급 |
+|  | `DELETE` | `/users/logout` | 로그아웃 |
+| 프로필 이미지 | `POST` | `/users/profile-images` | 프로필 이미지 업로드 |
+|  | `DELETE` | `/users/profile-images/{profileImageName}` | 프로필 이미지 삭제 |
+|  | `GET` | `/images/profiles/{fileName}` | 프로필 이미지 조회 |
+| 게시글 | `POST` | `/posts` | 게시글 작성 |
+|  | `GET` | `/posts` | 게시글 목록 조회 |
+|  | `GET` | `/posts?cursor={postId}` | 커서 기반 게시글 목록 조회 |
+|  | `GET` | `/posts/search?keyword={keyword}` | 게시글 검색 |
+|  | `GET` | `/posts/{postId}` | 게시글 상세 조회 |
+|  | `PATCH` | `/posts/{postId}` | 게시글 수정 |
+|  | `DELETE` | `/posts/{postId}` | 게시글 삭제 |
+| 게시글 이미지 | `POST` | `/posts/images` | 게시글 이미지 업로드 | 
+|  | `GET` | `/images/posts/{fileName}` | 게시글 이미지 조회 |
+| 좋아요 | `POST` | `/posts/{postId}/likes` | 게시글 좋아요 | 
+|  | `DELETE` | `/posts/{postId}/likes` | 게시글 좋아요 취소 | 
+| 댓글 | `GET` | `/posts/{postId}/comments` | 댓글 목록 조회 | 
+|  | `POST` | `/posts/{postId}/comments` | 댓글 작성 |
+|  | `PATCH` | `/posts/{postId}/comments/{commentId}` | 댓글 수정 | 
+|  | `DELETE` | `/posts/{postId}/comments/{commentId}` | 댓글 삭제 | 
 
 
