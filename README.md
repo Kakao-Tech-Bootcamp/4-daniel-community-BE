@@ -1,20 +1,51 @@
-# Daniel's Community
-> 사용자들이 게시글과 댓글을 작성하고 좋아요를 통해 소통할 수 있는
-> SpringBoot 기반 REST API 커뮤니티 서비스입니다.
+# KakaoTech Bootcamp Hub
 
+![landing.png](docs%2Fimages%2Flanding.png)
+
+>카카오테크 부트캠프의 소식과 학생들의 이야기가 모이는 커뮤니티 프론트엔드입니다 <br>
+> 학생들은 게시글을 작성하고 댓글과 좋아요로 소통하며 프로필과 계정을 관리할 수 있습니다
 <br>
 
+## 주요기능
+
+<table>
+  <tr>
+    <th width="500px" align="center">계정관리</th>
+    <th width="500px" align="center">커뮤니티</th>
+  </tr>
+  <tr>
+    <td width="500px" valign="top">
+      • 중복확인을 포함한 회원가입<br>
+      • 이메일과 비밀번호를 통한 로그인<br>
+      • 토큰기반 인증과 만료처리<br>
+      • 프로필이미지와 닉네임 수정<br>
+      • 새로운 비밀번호로 변경<br>
+      • 로그아웃과 회원탈퇴
+    </td>
+    <td width="500px" valign="top">
+      • 커서기반 페이지네이션<br>
+      • 키워드로 게시글 검색<br>
+      • 게시글 작성·조회·수정·삭제<br>
+      • 게시글이미지 업로드<br>
+      • 좋아요 등록과 취소<br>
+      • 댓글 작성·수정·삭제
+    </td>
+  </tr>
+</table>
+<br>
+
+
 ## 기술스택
-- Language: Java 17
-- Framework: Spring Boot 4.0.6 
-- Security: Spring Security & JWT
-- ORM: Spring Data JPA & QueryDSL
-- Database: MySQL
-- Container: Docker
-- Orchestration: Kubernetes & Helm
-- CI/CD: GitHub Actions
-- Container Registry: Docker Hub
-- Infrastructure: AWS EC2 & AWS SSM
+- Language | Java 17
+- Framework | Spring Boot 4.0.6 
+- Security | Spring Security & JWT
+- ORM | Spring Data JPA & QueryDSL
+- Database | MySQL
+- Container | Docker
+- Orchestration | Kubernetes & Helm
+- CI/CD | GitHub Actions
+- Container Registry | Docker Hub
+- Infrastructure | AWS EC2 & AWS SSM
 
 <br>
 
@@ -50,13 +81,10 @@ src/main/java/com/daniel/community
     ├── response
     └── security
 ```
-
 <br>
 
 ## 아키텍처
 <img src="docs/images/Architecture.png" width="1100">
-
-
 <br>
 
 ## API 목록
@@ -92,66 +120,4 @@ src/main/java/com/daniel/community
 |  | `PATCH` | `/posts/{postId}/comments/{commentId}` | 댓글 수정 | O |
 |  | `DELETE` | `/posts/{postId}/comments/{commentId}` | 댓글 삭제 | O |
 
-<br>
-
-## 환경변수
-```bash
-export DB_URL="jdbc:mysql://localhost:3306/community"
-export DB_USERNAME="community"
-export DB_PASSWORD="password"
-```
-
-<br>
-
-## 설치 및 실행
-```bash
-git clone https://github.com/Kakao-Tech-Bootcamp/4-daniel-community-BE.git
-cd 4-daniel-community-BE
-./gradlew bootRun
-```
-
-서버는 `http://localhost:3000`에서 실행됩니다.
-
-<br>
-
-### Docker
-```bash
-docker build -t daniel-community-be .
-
-docker run -d \
-  --name daniel-community-be \
-  -p 3000:3000 \
-  -e DB_URL="jdbc:mysql://host.docker.internal:3306/community" \
-  -e DB_USERNAME="daniel" \
-  -e DB_PASSWORD="password" \
-  -v "$(pwd)/uploads:/app/uploads" \
-  daniel-community-be
-```
-
-<br>
-
-### Kubernetes
-```bash
-kubectl create secret generic daniel-community-secret \
-  --from-literal=DB_URL="jdbc:mysql://mysql-host:3306/community" \
-  --from-literal=DB_USERNAME="daniel" \
-  --from-literal=DB_PASSWORD="password"
-```
-DB 접속 정보를 Secret으로 생성합니다.
-<br>
-
-```bash
-helm upgrade --install daniel-community \
-  ./deploy/helm/daniel-community \
-  --set image.repository="<DOCKERHUB_USERNAME>/daniel-community-be" \
-  --set image.tag="latest"
-```
-Helm으로 애플리케이션을 배포합니다.
-<br>
-
-```bash
-kubectl get pods
-kubectl rollout status deployment/daniel-community
-```
-배포 상태를 확인합니다.
 
